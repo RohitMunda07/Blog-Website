@@ -1,5 +1,6 @@
 import { Client, Databases, Storage, ID, Query } from "appwrite";
 import conf from "../conf/conf";
+import { useId } from "react";
 
 export class AppwriteService {
     client = new Client(); // Creating an Appwrite client instance
@@ -17,7 +18,7 @@ export class AppwriteService {
 
     // Content-Data services:-------------
 
-    async createPost({ title, slug, content, fileId, status, userid }) {
+    async createPost({ title, slug, content,  featuredImage, status, userid }) {
         try {
             return await this.databases.createDocument(
                 conf.appWriteDatabaseID, // Unique database ID
@@ -28,9 +29,9 @@ export class AppwriteService {
                 {
                     title,
                     content,
-                    fileId,
+                    featuredimage: featuredImage,
                     status,
-                    userid,
+                    userid: userData.$id,
                 }
             )
         } catch (error) {
@@ -39,7 +40,7 @@ export class AppwriteService {
     }
 
     // here the first parameter is for document ID which need to be updated
-    async updatePost(slug, { title, content, fileId, status }) {
+    async updatePost(slug, { title, content, featuredImage, status }) {
         try {
             return await this.databases.updateDocument(
                 conf.appWriteDatabaseID,
@@ -48,7 +49,7 @@ export class AppwriteService {
                 {
                     title,
                     content,
-                    fileId,
+                    featuredimage: featuredImage,
                     status,
                 }
             )

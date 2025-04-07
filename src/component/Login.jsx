@@ -14,29 +14,19 @@ function Login() {
 
     const login = async (data) => {
         setError("")
+
         try {
-            const session = await authService.login(data);
-            console.log("Session Created:", session);
+            const session = await authService.login(data)
             if (session) {
-                const user = await authService.getCurrentUser();
-                console.log("User Data:", user);
+                const userData = await authService.getCurrentUser();
+                if (userData) {
+                    dispatch(authLogin(userData))
+                    navigate("/")
+                }
             }
         } catch (error) {
-            console.error("Login Error:", error);
+            setError(error.message)
         }
-
-        // try {
-        //     const session = await authService.login(data)
-        //     if (session) {
-        //         const userData = await authService.getCurrentUser();
-        //         if (userData) {
-        //             dispatch(authLogin(userData))
-        //             navigate("/")
-        //         }
-        //     }
-        // } catch (error) {
-        //     setError(error.message)
-        // }
     }
 
     return (

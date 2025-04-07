@@ -15,6 +15,7 @@ export default function RTE({ name, control, label, defaultValue = "" }) {
                 // fild can be different properties
                 render={({ field: { onChange } }) => ( // traking is done when something changes
                     <Editor
+                        apiKey='g6yzctipyfz8r9gdapsp0u30jsnv5bunaznuwe1rm3h2wmx7'
                         initialValue={defaultValue}
                         init={{
                             initialValue: defaultValue,
