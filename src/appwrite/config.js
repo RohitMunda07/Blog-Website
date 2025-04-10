@@ -1,6 +1,7 @@
 import { Client, Databases, Storage, ID, Query } from "appwrite";
 import conf from "../conf/conf";
 import { useId } from "react";
+import authService from "./auth";
 
 export class AppwriteService {
     client = new Client(); // Creating an Appwrite client instance
@@ -18,20 +19,61 @@ export class AppwriteService {
 
     // Content-Data services:-------------
 
-    async createPost({ title, slug, content,  featuredImage, status, userid }) {
+    // async createPost({ title, slug, content,  featuredImage, status, userid }) {
+    //     const currentUser = await authService.account.get();
+    //     try {
+    //         return await this.databases.createDocument(
+    //             conf.appWriteDatabaseID, // Unique database ID
+    //             conf.appWriteCollectionID, // Unique collection ID
+    //             ID.unique(),   // Generates a unique document ID automatically
+
+    //             // object row of contents 
+    //             {
+    //                 title,
+    //                 content,
+    //                 featuredimage: featuredImage,
+    //                 status,
+    //                 userid: currentUser.$id,
+    //             }
+    //         )
+    //     } catch (error) {
+    //         console.log("Error Creating Post :: ", error);
+    //     }
+    // }
+
+    // // here the first parameter is for document ID which need to be updated
+    // async updatePost(slug, { title, content, featuredImage, status }) {
+    //     try {
+    //         return await this.databases.updateDocument(
+    //             conf.appWriteDatabaseID,
+    //             conf.appWriteCollectionID,
+    //             slug,
+    //             {
+    //                 title,
+    //                 content,
+    //                 featuredimage: featuredImage,
+    //                 status,
+    //             }
+    //         )
+    //     } catch (error) {
+    //         console.log("Error Updating Post :: ", error);
+    //     }
+    // }
+
+
+    async createPost({ title, slug, content, featuredimage, status, userid }) {
+        const currentUser = await authService.account.get();
         try {
             return await this.databases.createDocument(
-                conf.appWriteDatabaseID, // Unique database ID
-                conf.appWriteCollectionID, // Unique collection ID
-                slug,   // Generates a unique document ID automatically
-
-                // object row of contents 
+                conf.appWriteDatabaseID,
+                conf.appWriteCollectionID,
+                ID.unique(),
                 {
                     title,
                     content,
-                    featuredimage: featuredImage,
+                    featuredimage,
                     status,
-                    userid: userData.$id,
+                    userid: currentUser.$id,
                 }
             )
         } catch (error) {
@@ -39,8 +81,7 @@ export class AppwriteService {
         }
     }
 
-    // here the first parameter is for document ID which need to be updated
-    async updatePost(slug, { title, content, featuredImage, status }) {
+    async updatePost(slug, { title, content, featuredimage, status }) {
         try {
             return await this.databases.updateDocument(
                 conf.appWriteDatabaseID,
@@ -49,7 +90,7 @@ export class AppwriteService {
                 {
                     title,
                     content,
-                    featuredimage: featuredImage,
+                    featuredimage,
                     status,
                 }
             )
@@ -72,13 +113,28 @@ export class AppwriteService {
         }
     }
 
+    // async getPost(slug) {
+    //     try {
+    //         return await this.databases.getDocument(
+    //             conf.appWriteDatabaseID,
+    //             conf.appWriteCollectionID,
+    //             slug
+    //         )
+    //     } catch (error) {
+    //         console.log("Error Getting Post :: ", error);
+    //         return false;
+    //     }
+    // }
+
     async getPost(slug) {
         try {
-            return await this.databases.getDocument(
+            const post = await this.databases.getDocument(
                 conf.appWriteDatabaseID,
                 conf.appWriteCollectionID,
                 slug
-            )
+            );
+            console.log("Retrieved post:", post); // Log the post structure
+            return post;
         } catch (error) {
             console.log("Error Getting Post :: ", error);
             return false;
@@ -128,11 +184,25 @@ export class AppwriteService {
     }
 
     // since it has fast response we don't need async await
+    // getFilePreview(fileId) {
+    //     if (!fileId) return null;
+    //     return this.bucket.getFilePreview(
+    //         conf.appWriteBucketID,
+    //         fileId
+    //     )
+    // }
+
+    // In your AppwriteService class
     getFilePreview(fileId) {
-        return this.bucket.getFilePreview(
+        if (!fileId) {
+            return null;
+        }
+        
+        // Return the complete URL string
+        return this.bucket.getFileView(
             conf.appWriteBucketID,
             fileId
-        )
+        );
     }
 
 }

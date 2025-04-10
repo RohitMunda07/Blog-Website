@@ -23,24 +23,54 @@ export default function Post() {
         } else navigate("/");
     }, [slug, navigate]);
 
+    // const deletePost = () => {
+    //     appwriteService.deletePost(post.$id).then((status) => {
+    //         if (status) {
+    //             appwriteService.deleteFile(post.featuredImage);
+    //             navigate("/");
+    //         }
+    //     });
+    // };
+
     const deletePost = () => {
         appwriteService.deletePost(post.$id).then((status) => {
             if (status) {
-                appwriteService.deleteFile(post.featuredImage);
+                if (post.featuredimage) {
+                    { console.log("Image deleted with fileId: ", post.featuredimage) }
+                    appwriteService.deleteFile(post.featuredimage);
+                }
                 navigate("/");
             }
         });
     };
 
+
+
     return post ? (
         <div className="py-8">
             <Container>
                 <div className="w-full flex justify-center mb-4 relative border rounded-xl p-2">
-                    <img
+
+                    {/* <img
                         src={appwriteService.getFilePreview(post.featuredImage)}
                         alt={post.title}
                         className="rounded-xl"
+                    /> */}
+
+
+                    <img
+                        src={post.featuredimage ? appwriteService.getFilePreview(post.featuredimage) : 'https://via.placeholder.com/400x300'}
+                        alt={post.title}
+                        className="rounded-xl"
+                        onError={(e) => {
+                            // Prevent infinite loops if the fallback also fails
+                            if (!e.target.src.includes('placeholder')) {
+                                console.error("Image failed to load:", e.target.src);
+                                e.target.src = 'https://via.placeholder.com/400x300';
+                            }
+                        }}
                     />
+                    {console.log("Image fileId: ", post.featuredimage)}
 
                     {isAuthor && (
                         <div className="absolute right-6 top-6">
