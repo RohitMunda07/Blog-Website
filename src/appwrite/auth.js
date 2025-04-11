@@ -14,7 +14,7 @@ export class AuthService {
         this.account = new Account(this.client)
     }
 
-    async createAccount({email, password, name}) {
+    async createAccount({ email, password, name }) {
         try {
             const userAccount = await this.account.create(
                 ID.unique(), // userId
@@ -24,18 +24,19 @@ export class AuthService {
             )
 
             if (userAccount) {
-                this.login(email, password)
-            }else{
+                // Return the login result
+                return await this.login({ email, password })
+            } else {
                 return userAccount;
             }
 
         } catch (error) {
             console.log("Error Creating Account :: ", error);
-            
+            throw error; // Re-throw the error so the component can handle it
         }
     }
 
-    async login({email, password}){
+    async login({ email, password }) {
         try {
             return await this.account.createEmailPasswordSession(email, password);
         } catch (error) {
@@ -43,7 +44,7 @@ export class AuthService {
         }
     }
 
-    async logout(){
+    async logout() {
         try {
             return await this.account.deleteSessions();
         } catch (error) {
@@ -51,7 +52,7 @@ export class AuthService {
         }
     }
 
-    async getCurrentUser(){
+    async getCurrentUser() {
         try {
             return await this.account.get()
         } catch (error) {

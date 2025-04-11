@@ -3,3 +3,32 @@ To summarize what we fixed:
 1. Field naming consistency - Making sure we used "featuredimage" (lowercase) consistently throughout your code, matching your Appwrite database structure
 2. Image display - Correctly implementing the getFilePreview method in your AppwriteService class
 3. Error handling - Adding proper fallback for missing images and preventing infinite error loop
+
+------------------------------------------------------------------------------------------------------------
+Summary of the Issue and Solution
+The problem was that the user authorization for editing posts wasn't working correctly. After debugging, we found two distinct issues:
+Issue 1: Property Name Case Mismatch
+The first issue was in the author check comparison. In the Post component, you were looking for post.userId (with uppercase 'U') but the actual property stored in the database was post.userid (with lowercase 'u'). Since JavaScript is case-sensitive, this comparison was always failing.
+Issue 2: Nested Redux State Structure
+The second issue was with how you were accessing the user data from Redux. Your Redux store had a nested structure where your user data was inside another object:
+
+userData: {
+  userData: {
+    $id: "67f898d40037fef9f22a",
+    ...
+  }
+}
+
+When you tried to access userData.$id, it was undefined because $id was inside the nested userData object.
+Solution
+The authorization check needed to be updated to:
+
+const isAuthor = post && userData?.userData ? post.userid === userData.userData.$id : false;
+
+
+This change properly accesses:
+
+The correct property name (userid not userId)
+The correct path to the user ID in your Redux state structure
+
+This ensures the edit and delete buttons appear correctly when the current user is the author of the post.
