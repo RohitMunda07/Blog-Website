@@ -56,6 +56,7 @@ export class AuthService {
         try {
             return await this.account.get()
         } catch (error) {
+            await this.logout(); // 👈 auto-logout on invalid session
             console.log("Error Getting Account :: ", error);
         }
 

@@ -7,6 +7,26 @@ import { Footer, Header } from './component';
 
 import './App.css'
 
+useEffect(() => {
+  const timeout = setTimeout(async () => {
+    await authService.logout();
+    window.location.href = "/login";
+  }, 15 * 60 * 1000); // 15 minutes
+
+  const resetTimer = () => {
+    clearTimeout(timeout);
+  };
+
+  window.addEventListener("mousemove", resetTimer);
+  window.addEventListener("keypress", resetTimer);
+
+  return () => {
+    window.removeEventListener("mousemove", resetTimer);
+    window.removeEventListener("keypress", resetTimer);
+  };
+}, []);
+
+
 function App() {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
